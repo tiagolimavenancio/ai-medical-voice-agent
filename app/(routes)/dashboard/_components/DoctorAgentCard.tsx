@@ -8,6 +8,8 @@ import { Loader2Icon } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
+import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@clerk/nextjs";
 
 export type DoctorAgent = {
   id: number;
@@ -16,6 +18,7 @@ export type DoctorAgent = {
   image: string;
   agentPrompt: string;
   voiceId?: string;
+  subscriptionRequired: boolean;
 };
 
 type DoctorAgentCardProps = {
@@ -24,9 +27,11 @@ type DoctorAgentCardProps = {
 
 function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
-
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { has } = useAuth();
+
+  const isPaidUser = has && has({ plan: "pro" });
 
   useEffect(() => {
     if (cardRef.current) {
@@ -47,9 +52,13 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
         selectedDoctor: doctor,
       });
 
-      if (result.data?.data?.sessionId) {
-        router.push("/dashboard/medical-agent/" + result.data.data.sessionId);
+      const sessionId = result.data?.data?.sessionId;
+
+      if (!sessionId) {
+        return;
       }
+
+      router.push("/dashboard/medical-agent/" + sessionId);
     } catch (e: any) {
       console.error("❌ Error starting consultation:", e);
     } finally {
@@ -62,6 +71,11 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
       ref={cardRef}
       className="relative bg-white shadow-md rounded-xl overflow-hidden group transition hover:shadow-xl"
     >
+      {doctor.subscriptionRequired && (
+        <Badge className="absolute top-2 right-2 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+          Premium
+        </Badge>
+      )}
       <div className="relative aspect-[4/3] w-full bg-gray-100 overflow-hidden">
         <Image
           src={doctor.image}
@@ -77,6 +91,7 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
         <p className="text-sm text-gray-500 line-clamp-2 mt-1">{doctor.description}</p>
 
         <Button
+          disabled={!isPaidUser && doctor.subscriptionRequired}
           className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-blue-600 text-white hover:from-indigo-600 hover:to-blue-700"
           onClick={handleStartConsultation}
         >

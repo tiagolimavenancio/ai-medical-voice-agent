@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { DoctorAgent } from "@/app/(routes)/dashboard/_components/DoctorAgentCard";
 import SuggestedDoctorCard from "@/app/(routes)/dashboard/_components/SuggestedDoctorCard";
 import { Button } from "@/components/ui/button";
@@ -13,57 +17,84 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import axios from "axios";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-
-import { useState } from "react";
+import { useAuth } from "@clerk/nextjs";
+import { SessionDetail } from "@/app/(routes)/dashboard/medical-agent/[sessionId]/page";
 
 function AddNewSessionDialog() {
   const [note, setNote] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [suggestedDoctors, setSuggestedDoctor] = useState<DoctorAgent[]>([]);
   const [selectedDoctor, setSelectedDoctor] = useState<DoctorAgent | null>(null);
-
+  const [history, setHistory] = useState<SessionDetail[]>([]);
   const router = useRouter();
+  const { has } = useAuth();
 
-  const onClickNext = () => {
-    if (!note || note.trim().length < 3) {
+  const isPaidUser = typeof has === "function" && has({ plan: "pro" });
+
+  useEffect(() => {
+    const getHistoryList = async () => {
+      try {
+        const result = await axios.get("/api/session-chat?sessionId=all");
+        setHistory(result.data || []);
+      } catch (e: any) {
+        setHistory([]);
+      }
+    };
+
+    getHistoryList();
+  }, []);
+
+  const onClickNext = async () => {
+    if (!note.trim()) {
       return;
     }
 
     setIsLoading(true);
-
     try {
-      const response = axios.post("/api/suggest-docters", {
+      const result = await axios.post("/api/suggest-doctors", {
         notes: note,
       });
 
-      console.log({ response });
-      // const { data } = response;
-      // setSuggestedDoctor(data);
+      const doctors = result.data?.doctors;
+
+      if (!Array.isArray(doctors)) {
+        return;
+      }
+
+      setSuggestedDoctor(doctors || []);
+      setSelectedDoctor(null);
     } catch (error) {
       console.log("Error fetching doctor suggestion: ", error);
+      setSuggestedDoctor([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleStartConsultation = async () => {
+    if (!selectedDoctor || isLoading) return;
+
     setIsLoading(true);
 
-    const result = await axios.post("/api/session-chat", {
-      notes: note,
-      selectedDoctor: selectedDoctor,
-    });
+    try {
+      const result = await axios.post("/api/session-chat", {
+        notes: note,
+        selectedDoctor,
+      });
 
-    console.log(result.data);
+      const sessionId = result.data.sessionId;
 
-    if (result.data.sessionId) {
-      router.push(`/dashboard/medical-agent/${result.data.sessionId}`);
+      if (!sessionId) {
+        return;
+      }
+
+      router.push(`/dashboard/medical-agent/${sessionId}`);
+    } catch (e: any) {
+      console.error("❌ Error starting consultation:", e);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleCancle = () => {
@@ -75,8 +106,9 @@ function AddNewSessionDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        {/* Disable button for non-paying users if they already have 1 or more sessions */}
-        <Button className="mt-3">+ Start a Consultation</Button>
+        <Button className="mt-3" disabled={!isPaidUser && history.length >= 1}>
+          + Start a Consultation
+        </Button>
       </DialogTrigger>
 
       <DialogContent>

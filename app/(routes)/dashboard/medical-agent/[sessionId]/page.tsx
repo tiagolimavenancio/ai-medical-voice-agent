@@ -25,7 +25,7 @@ type Messages = {
   text: string;
 };
 
-function MedicalVoiceAgent() {
+function MedicalVoiceAgentPage() {
   const { sessionId } = useParams();
   const [sessionDetail, setSessionDetail] = useState<SessionDetail>();
   const [callStarted, setCallStarted] = useState(false);
@@ -189,4 +189,4 @@ function MedicalVoiceAgent() {
   );
 }
 
-export default MedicalVoiceAgent;
+export default MedicalVoiceAgentPage;
