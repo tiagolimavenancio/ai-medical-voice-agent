@@ -4,11 +4,12 @@ import HistoryList from "@/app/(routes)/dashboard/_components/HistoryList";
 
 function Dashboard() {
   return (
-    <div>
+    <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-2xl">My Dashboard</h2>
+        <h1 className="text-3xl font-bold">Dashboard</h1>
         <AddNewSessionDialog />
       </div>
+
       <HistoryList />
       <DoctorsAgentList />
     </div>

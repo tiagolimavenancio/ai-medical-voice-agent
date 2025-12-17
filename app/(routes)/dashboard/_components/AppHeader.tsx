@@ -1,43 +1,66 @@
 import { UserButton } from "@clerk/nextjs";
 import Image from "next/image";
+import Link from "next/link";
 
-const menuOptions = [
+const options = [
   {
     id: 1,
     name: "Home",
-    path: "/home",
+    path: "/dashboard",
   },
   {
     id: 2,
     name: "History",
-    path: "/history",
+    path: "/dashboard/history",
   },
 
   {
     id: 3,
     name: "Pricing",
-    path: "/pricing",
+    path: "/dashboard/billing",
   },
   {
     id: 4,
     name: "Profile",
-    path: "/profile",
+    path: "/dashboard/profile",
   },
 ];
 
 function AppHeader() {
   return (
-    <div className="flex items-center justify-between p-4 shadow px-10 md:px-20 lg:px-40">
-      <Image src={"/logo.svg"} alt="logo" width={180} height={90} />
-      <div className="hidden md:flex gap-12 items-center">
-        {menuOptions.map((option, index) => (
-          <div key={index}>
-            <h2 className="hover:font-bold cursor-pointer">{option.name}</h2>
-          </div>
+    <header className="flex items-center justify-between p-4 bg-white shadow-md px-6 md:px-16 lg:px-32">
+      <Link href="/">
+        <div className="flex items-center gap-2">
+          <svg
+            className="h-8 w-8 text-red-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M12 4v16m8-8H4"
+            ></path>
+          </svg>
+          <h1 className="text-lg font-bold md:text-2xl text-blue-700">MediAI</h1>
+        </div>
+      </Link>
+
+      <nav className="hidden md:flex gap-10 items-center">
+        {options.map((option) => (
+          <Link key={option.id} href={option.path} passHref>
+            <span className="text-gray-600 hover:text-gray-900 hover:font-semibold transition-all cursor-pointer">
+              {option.name}
+            </span>
+          </Link>
         ))}
-      </div>
+      </nav>
+
       <UserButton />
-    </div>
+    </header>
   );
 }
 

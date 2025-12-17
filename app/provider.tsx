@@ -13,19 +13,23 @@ export type UsersDetail = {
 };
 
 function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { user } = useUser();
+  const { isLoaded, user } = useUser();
   const [userDetail, setUserDetail] = useState<UsersDetail | undefined>(undefined);
 
   const createNewUser = async () => {
-    const result = await axios.post("/api/users");
-    setUserDetail(result.data);
+    try {
+      const result = await axios.post("/api/users");
+      setUserDetail(result.data);
+    } catch (e: any) {
+      console.error({ e });
+    }
   };
 
   useEffect(() => {
-    if (user) {
+    if (isLoaded && user) {
       createNewUser();
     }
-  }, [user]);
+  }, [isLoaded, user]);
 
   return (
     <div>

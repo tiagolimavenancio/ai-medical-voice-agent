@@ -1,19 +1,26 @@
 "use client";
-import AddNewSessionDialog from "@/app/(routes)/dashboard/_components/AddNewSessionDialog";
-import Image from "next/image";
 import { useState } from "react";
+import AddNewSessionDialog from "@/app/(routes)/dashboard/_components/AddNewSessionDialog";
+import { SessionDetail } from "@/app/(routes)/dashboard/medical-agent/[sessionId]/page";
+import Image from "next/image";
 
 function HistoryList() {
-  const [historyList, setHistoryList] = useState([]);
+  const [history, setHistory] = useState<SessionDetail[]>([]);
 
   return (
-    <div className="mt-10">
-      {historyList.length === 0 ? (
-        <div className="flex items-center flex-col justify-center p-7 border border-dashed rounded-2xl border-2">
-          <Image src={"/medical-assistance.png"} alt="empty" width={150} height={150} />
-          <h2 className="font-bold text-xl mt-5">No Consultations Yet</h2>
-          <p className="text-gray-500">
-            You don&apos;t have any consultations with any doctor yet.
+    <div className="p-10 bg-white shadow-lg rounded-xl min-h-[300px]">
+      {history.length === 0 ? (
+        <div className="flex flex-col items-center justify-center text-center space-y-4">
+          <Image
+            src={"/medical-assistance.png"}
+            alt="No history available"
+            width={120}
+            height={120}
+          />
+          <h2 className="text-lg font-semibold text-gray-700">No Recent Consultations</h2>
+          <p className="text-sm text-gray-500">
+            It seems you haven't had any consultations yet. Start your journey to better health by
+            booking your first appointment today!
           </p>
           <AddNewSessionDialog />
         </div>

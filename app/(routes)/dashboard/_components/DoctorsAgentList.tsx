@@ -1,15 +1,13 @@
 import DoctorAgentCard from "@/app/(routes)/dashboard/_components/DoctorAgentCard";
-import { AIDoctorAgents } from "@/shared/list";
+import { doctorList } from "@/shared/list";
 
 function DoctorsAgentList() {
   return (
-    <div className="mt-10">
-      <h2 className="text-2xl font-bold">AI Specialist Doctors Agents</h2>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 mt-5">
-        {AIDoctorAgents.map((doctor) => (
-          <div key={doctor.id}>
-            <DoctorAgentCard doctor={doctor} />
-          </div>
+    <div>
+      <h2 className="text-2xl font-bold mb-4">AI specialist Doctor</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {doctorList.map((doctor) => (
+          <DoctorAgentCard key={doctor.id} doctor={doctor} />
         ))}
       </div>
     </div>
