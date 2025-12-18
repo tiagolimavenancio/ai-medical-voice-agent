@@ -1,11 +1,11 @@
-import HistoryList from "@/app/(routes)/dashboard/_components/HistoryList";
+import React from 'react'
+import HistoryList from '../_components/HistoryList'
 
-function HistoryPage() {
-  return (
+function History(){
+return (
     <div>
-      <HistoryList />
+        <HistoryList/>
     </div>
-  );
+)
 }
-
-export default HistoryPage;
+export default History

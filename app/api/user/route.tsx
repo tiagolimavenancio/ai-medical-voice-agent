@@ -1,13 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-import { db } from "@/config/db";
-import { sessionChatTable, usersTable } from "@/config/schema";
-import { currentUser } from "@clerk/nextjs/server";
-import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
+import { db } from "@/config/db";
+import { usersTable, SessionChatTable } from "@/config/schema";
+import { eq } from "drizzle-orm";
 
 // POST: Create a user if not already in DB
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     const user = await currentUser();
 
@@ -23,16 +21,17 @@ export async function POST(req: NextRequest) {
       const result = await db
         .insert(usersTable)
         .values({
-          name: user?.fullName ?? "Unknown User",
+          name: user.fullName ?? "Unknown User",
           email: email,
           credits: 10,
         })
         .returning();
 
+      // Ensure returned values are serializable
       const userRow = result[0];
       const safeUser = {
         ...userRow,
-        id: Number(userRow.id),
+        id: Number(userRow.id), // if id is BigInt
       };
 
       return NextResponse.json(safeUser, { status: 201 });
@@ -45,11 +44,13 @@ export async function POST(req: NextRequest) {
     };
 
     return NextResponse.json(safeExisting, { status: 200 });
-  } catch (e: any) {
+  } catch (error) {
+    console.error("User creation error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
+// GET: Fetch session data by sessionId
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -57,25 +58,26 @@ export async function GET(req: NextRequest) {
     const user = await currentUser();
 
     if (!sessionId) {
-      return NextResponse.json({ error: "Missing Session Id" }, { status: 400 });
+      return NextResponse.json({ error: "Missing sessionId" }, { status: 400 });
     }
 
     const result = await db
       .select()
-      .from(sessionChatTable)
-      .where(eq(sessionChatTable.sessionId, sessionId));
+      .from(SessionChatTable)
+      .where(eq(SessionChatTable.sessionid, sessionId));
 
     const session = result[0];
     const safeSession = session
       ? {
           ...session,
           id: Number(session.id),
-          createdAt: session.createdOn ? new Date(session.createdOn).toISOString() : null,
+          created_at: session.createdOn ? new Date(session.createdOn).toISOString() : null,
         }
       : null;
 
     return NextResponse.json(safeSession, { status: 200 });
-  } catch (e: any) {
+  } catch (error) {
+    console.error("Session fetch error:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

@@ -1,5 +1,7 @@
 "use client";
 import { cn } from "@/lib/utils";
+import React from "react";
+
 import {
   IconBoxAlignRightFilled,
   IconClipboardCopy,
@@ -10,7 +12,10 @@ import {
 import { motion } from "motion/react";
 import { BentoGrid, BentoGridItem } from "@/components/ui/bento-grid";
 
-export function FeaturedBentoGrid() {
+
+
+
+export function BentoF() {
   return (
     <BentoGrid className="max-w-4xl mx-auto md:auto-rows-[20rem]">
       {items.map((item, i) => (
@@ -143,7 +148,8 @@ const SkeletonThree = () => {
       }}
       className="flex flex-1 w-full h-full min-h-[6rem] dark:bg-dot-white/[0.2] rounded-lg bg-dot-black/[0.2] flex-col space-y-2"
       style={{
-        background: "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)",
+        background:
+          "linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab)",
         backgroundSize: "400% 400%",
       }}
     >
@@ -277,8 +283,8 @@ const SkeletonFive = () => {
           className="rounded-full h-10 w-10"
         />
         <p className="text-xs text-neutral-500">
-          There are a lot of cool framerworks out there like React, Angular, Vue, Svelte that can
-          make your life ....
+          There are a lot of cool framerworks out there like React, Angular,
+          Vue, Svelte that can make your life ....
         </p>
       </motion.div>
       <motion.div
@@ -295,7 +301,9 @@ const items = [
   {
     title: "AI Content Generation",
     description: (
-      <span className="text-sm">Experience the power of AI in generating unique content.</span>
+      <span className="text-sm">
+        Experience the power of AI in generating unique content.
+      </span>
     ),
     header: <SkeletonOne />,
     className: "md:col-span-1",
@@ -303,7 +311,11 @@ const items = [
   },
   {
     title: "Automated Proofreading",
-    description: <span className="text-sm">Let AI handle the proofreading of your documents.</span>,
+    description: (
+      <span className="text-sm">
+        Let AI handle the proofreading of your documents.
+      </span>
+    ),
     header: <SkeletonTwo />,
     className: "md:col-span-1",
     icon: <IconFileBroken className="h-4 w-4 text-neutral-500" />,
@@ -311,7 +323,9 @@ const items = [
   {
     title: "Contextual Suggestions",
     description: (
-      <span className="text-sm">Get AI-powered suggestions based on your writing context.</span>
+      <span className="text-sm">
+        Get AI-powered suggestions based on your writing context.
+      </span>
     ),
     header: <SkeletonThree />,
     className: "md:col-span-1",
@@ -320,7 +334,9 @@ const items = [
   {
     title: "Sentiment Analysis",
     description: (
-      <span className="text-sm">Understand the sentiment of your text with AI analysis.</span>
+      <span className="text-sm">
+        Understand the sentiment of your text with AI analysis.
+      </span>
     ),
     header: <SkeletonFour />,
     className: "md:col-span-2",
@@ -330,7 +346,9 @@ const items = [
   {
     title: "Text Summarization",
     description: (
-      <span className="text-sm">Summarize your lengthy documents with AI technology.</span>
+      <span className="text-sm">
+        Summarize your lengthy documents with AI technology.
+      </span>
     ),
     header: <SkeletonFive />,
     className: "md:col-span-1",

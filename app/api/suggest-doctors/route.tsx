@@ -1,13 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { NextRequest, NextResponse } from "next/server";
 import { openai } from "@/config/OpenAiModel";
 import { doctorList } from "@/shared/list";
-import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const { notes } = await req.json();
 
+  console.log("📝 Received notes:", notes);
+
   try {
     const completion = await openai.chat.completions.create({
+      // model: 'google/gemma-3-27b-it:free',
       model: "openai/gpt-4.1-nano",
       messages: [
         {
@@ -24,11 +26,16 @@ ${doctorList.map((d) => d.id).join(", ")}
 Only return valid JSON — no explanations, markdown, or formatting.
           `,
         },
-        { role: "user", content: `User symptoms: ${notes}. Recommend 2–3 doctorIds.` },
+        {
+          role: "user",
+          content: `User symptoms: ${notes}. Recommend 2–3 doctorIds.`,
+        },
       ],
     });
 
-    const rawResp = completion.choices[0].message.content || "";
+    const rawResp = completion.choices[0].message?.content || "";
+    console.log("🤖 Raw model response:", rawResp);
+
     const cleanedResp = rawResp
       .trim()
       .replace(/^```json/, "")
@@ -36,6 +43,7 @@ Only return valid JSON — no explanations, markdown, or formatting.
       .replace(/```$/, "");
 
     const parsed = JSON.parse(cleanedResp);
+    console.log("✅ Parsed doctorIds:", parsed);
 
     const matchedDoctors = parsed.doctorIds
       .map((id: number) => doctorList.find((doc) => doc.id === id))
@@ -43,6 +51,8 @@ Only return valid JSON — no explanations, markdown, or formatting.
 
     return NextResponse.json({ doctors: matchedDoctors });
   } catch (e: any) {
+    console.error("❌ Error:", e.message);
+
     return NextResponse.json({
       doctors: [
         doctorList.find((d) => d.id === 1) || {

@@ -1,41 +1,48 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use } from "react";
 import axios from "axios";
+import { useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
-import { UserDetailContext } from "@/context/UserDetailContext";
+import { db } from "@/config/db";
+import { createContext, useState } from "react";
+import { userDcontext } from "../context/UserDcontex"; // Adjust the import path as needed
 
-export type UsersDetail = {
+export type UserDetail = {
   name: string;
   email: string;
   credits: number;
 };
+export function Provider({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const { user, isLoaded } = useUser();
 
-function Provider({ children }: Readonly<{ children: React.ReactNode }>) {
-  const { isLoaded, user } = useUser();
-  const [userDetail, setUserDetail] = useState<UsersDetail | undefined>(undefined);
-
-  const createNewUser = async () => {
-    try {
-      const result = await axios.post("/api/users");
-      setUserDetail(result.data);
-    } catch (e: any) {
-      console.error({ e });
-    }
-  };
+  const [userDetail, setUserDetail] = useState<any>();
 
   useEffect(() => {
     if (isLoaded && user) {
-      createNewUser();
+      CreatenewUser();
     }
   }, [isLoaded, user]);
 
+  const CreatenewUser = async () => {
+    try {
+      const result = await axios.post("/api/user");
+      console.log("User created:", result.data);
+      setUserDetail(result.data);
+    } catch (error) {
+      console.error("Error creating user:", error);
+    }
+  };
+
   return (
     <div>
-      <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
+      <userDcontext.Provider value={{ userDetail, setUserDetail }}>
         {children}
-      </UserDetailContext.Provider>
+      </userDcontext.Provider>
     </div>
   );
 }

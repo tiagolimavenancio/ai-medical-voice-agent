@@ -1,37 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@tabler/icons-react";
-import axios from "axios";
-import { Loader2Icon } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { gsap } from "gsap";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@clerk/nextjs";
 
-export type DoctorAgent = {
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+import axios from "axios";
+import Image from "next/image";
+import gsap from "gsap";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Loader2Icon, ArrowRight } from "lucide-react";
+
+export type Doctor = {
   id: number;
   specialist: string;
   description: string;
   image: string;
   agentPrompt: string;
-  voiceId?: string;
+  voiceId: string;
   subscriptionRequired: boolean;
 };
 
-type DoctorAgentCardProps = {
-  doctor: DoctorAgent;
+type DoctorACardProps = {
+  doctor: Doctor;
 };
 
-function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [isLoading, setIsLoading] = useState(false);
+function DoctorACard({ doctor }: DoctorACardProps) {
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { has } = useAuth();
+  //@ts-ignore
+  const paidUser = has && has({ plan: "pro" });
 
-  const isPaidUser = has && has({ plan: "pro" });
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (cardRef.current) {
@@ -43,26 +44,21 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
     }
   }, []);
 
-  const handleStartConsultation = async () => {
-    setIsLoading(true);
-
+  const onStartConsultation = async () => {
+    setLoading(true);
     try {
       const result = await axios.post("/api/session-chat", {
         notes: "New Query",
         selectedDoctor: doctor,
       });
 
-      const sessionId = result.data?.data?.sessionId;
-
-      if (!sessionId) {
-        return;
+      if (result.data?.data?.sessionid) {
+        router.push("/dashboard/medical-agent/" + result.data.data.sessionid);
       }
-
-      router.push("/dashboard/medical-agent/" + sessionId);
-    } catch (e: any) {
-      console.error("❌ Error starting consultation:", e);
+    } catch (error) {
+      console.error("❌ Error starting consultation:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -76,6 +72,8 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
           Premium
         </Badge>
       )}
+
+      {/* Image container with fixed aspect ratio */}
       <div className="relative aspect-[4/3] w-full bg-gray-100 overflow-hidden">
         <Image
           src={doctor.image}
@@ -91,14 +89,14 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
         <p className="text-sm text-gray-500 line-clamp-2 mt-1">{doctor.description}</p>
 
         <Button
-          disabled={!isPaidUser && doctor.subscriptionRequired}
           className="w-full mt-4 bg-gradient-to-r from-indigo-500 to-blue-600 text-white hover:from-indigo-600 hover:to-blue-700"
-          onClick={handleStartConsultation}
+          onClick={onStartConsultation}
+          disabled={!paidUser && doctor.subscriptionRequired}
         >
-          {isLoading ? (
+          {loading ? (
             <Loader2Icon className="animate-spin h-4 w-4 mr-2" />
           ) : (
-            <IconArrowRight className="h-4 w-4 mr-2" />
+            <ArrowRight className="h-4 w-4 mr-2" />
           )}
           Start Consultation
         </Button>
@@ -107,4 +105,4 @@ function DoctorAgentCard({ doctor }: DoctorAgentCardProps) {
   );
 }
 
-export default DoctorAgentCard;
+export default DoctorACard;

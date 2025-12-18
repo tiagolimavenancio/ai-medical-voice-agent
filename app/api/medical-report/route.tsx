@@ -1,11 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { db } from "@/config/db";
-import { openai } from "@/config/OpenAiModel";
-import { sessionChatTable } from "@/config/schema";
-import { eq } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
+import { openai } from "@/config/OpenAiModel";
+import { SessionChatTable } from "@/config/schema";
+import { db } from "@/config/db";
+import { eq } from "drizzle-orm";
 
-const REPORT_GEN_PROMPT = `You are an AI Medical Voice Agent that just finished a voice conversation with a user. Based on doctor AI agent info and conversation between AI medical agent and user, generate a structured report with the following fields:
+export async function POST(req: NextRequest) {
+  const { sessionId, sessionDetail, messages, durationInSeconds } = await req.json();
+
+  const formattedDuration = `${Math.floor(durationInSeconds / 60)} minutes ${
+    durationInSeconds % 60
+  } seconds`;
+
+  console.log("📡 API Hit — sessionId:", sessionId);
+  console.log("📡 Received Messages:", messages?.length);
+  console.log("📡 Agent:", sessionDetail?.selectedDoctor?.specialist);
+
+  const REPORT_GEN_PROMPT = `You are an AI Medical Voice Agent that just finished a voice conversation with a user. Based on doctor AI agent info and conversation between AI medical agent and user, generate a structured report with the following fields:
 
 1. sessionid: a unique session identifier
 2. agent: the medical specialist name (e.g., "General Physician AI")
@@ -37,14 +47,11 @@ Return the result in this JSON format:
 Only include valid fields. Respond with nothing else.
 `;
 
-export async function POST(req: NextRequest) {
-  const { sessionId, sessionDetail, messages } = await req.json();
-
   try {
     const userInput =
-      "AI Doctor Agent Info: " +
+      "AI Doctor Agent Info:" +
       JSON.stringify(sessionDetail) +
-      ", Conversation: " +
+      ",Conversation:" +
       JSON.stringify(messages);
 
     const completion = await openai.chat.completions.create({
@@ -55,7 +62,9 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    const rawResp = completion.choices[0].message.content || "";
+    const rawResp = completion.choices[0].message?.content || "";
+    console.log("🤖 Raw model response:", rawResp);
+
     const cleanedResp = rawResp
       .trim()
       .replace(/^```json/, "")
@@ -63,14 +72,19 @@ export async function POST(req: NextRequest) {
       .replace(/```$/, "");
 
     const parsed = JSON.parse(cleanedResp);
+    parsed.duration = formattedDuration;
 
+    console.log("✅ Parsed doctor report:", parsed);
+
+    // Save to DB
     await db
-      .update(sessionChatTable)
+      .update(SessionChatTable)
       .set({ report: parsed, conversation: messages })
-      .where(eq(sessionChatTable.sessionId, sessionId));
+      .where(eq(SessionChatTable.sessionid, sessionId));
 
     return NextResponse.json(parsed);
   } catch (e: any) {
-    return NextResponse.json({ error: e?.message || "Unknow server error" }, { status: 500 });
+    console.error("❌ Error parsing AI response or DB issue:", e?.message || e);
+    return NextResponse.json({ error: e?.message || "Unknown server error" }, { status: 500 });
   }
 }

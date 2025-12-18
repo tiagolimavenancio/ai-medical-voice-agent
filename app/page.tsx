@@ -1,11 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
-
+import React, { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
+import { useUser, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
-import { UserButton, useUser } from "@clerk/nextjs";
-import { useRouter } from "next/navigation";
 import { gsap } from "gsap";
 
 const BentoF = () => {
@@ -21,32 +20,23 @@ const BentoF = () => {
               title: "Instant Diagnosis",
               desc: "Get immediate preliminary diagnoses based on your symptoms.",
               iconColor: "text-blue-600",
-              iconPath:
-                "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.001 12.001 0 002 12c0 2.757 1.125 5.228 2.938 7.072M18 10a8 8 0 11-16 0 8 8 0 0116 0z",
+              iconPath: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.001 12.001 0 002 12c0 2.757 1.125 5.228 2.938 7.072M18 10a8 8 0 11-16 0 8 8 0 0116 0z"
             },
             {
               title: "Personalized Insights",
               desc: "Receive tailored health recommendations and insights for your well-being.",
               iconColor: "text-green-600",
-              iconPath: "M7 8h10M7 12h10m-9 4h4M8 10l4-4 4 4m0 0l-4 4-4-4",
+              iconPath: "M7 8h10M7 12h10m-9 4h4M8 10l4-4 4 4m0 0l-4 4-4-4"
             },
             {
               title: "24/7 Availability",
               desc: "Your AI assistant is always ready to answer your health queries.",
               iconColor: "text-purple-600",
-              iconPath: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-            },
+              iconPath: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+            }
           ].map(({ title, desc, iconColor, iconPath }, i) => (
-            <div
-              key={i}
-              className="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-xl border border-neutral-200 shadow-md transition-transform duration-300 hover:scale-105"
-            >
-              <svg
-                className={`h-12 w-12 ${iconColor} mb-4`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+            <div key={i} className="flex flex-col items-center justify-center p-8 bg-gray-100 rounded-xl border border-neutral-200 shadow-md transition-transform duration-300 hover:scale-105">
+              <svg className={`h-12 w-12 ${iconColor} mb-4`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={iconPath} />
               </svg>
               <h3 className="text-xl font-semibold mb-2">{title}</h3>
@@ -61,7 +51,6 @@ const BentoF = () => {
 
 const Navbar = () => {
   const { user } = useUser();
-
   return (
     <nav className="flex w-full items-center justify-between border-t border-b border-neutral-200 px-4 py-4 bg-white text-neutral-800 rounded-xl shadow-lg z-20 relative">
       <div className="flex items-center gap-2">
@@ -90,7 +79,7 @@ const Navbar = () => {
   );
 };
 
-export default function Home() {
+export default function HeroSectionOne() {
   const { user, isLoaded } = useUser();
   const router = useRouter();
 
@@ -111,7 +100,7 @@ export default function Home() {
           duration: 0.8,
           ease: "power3.out",
           stagger: 0.08,
-          delay: 0.5,
+          delay: 0.5
         }
       );
     }
@@ -148,7 +137,7 @@ export default function Home() {
     <div className="relative flex min-h-screen w-full flex-col items-center justify-center px-4 py-10 bg-gray-50 text-neutral-800 font-inter">
       <style jsx global>{`
         body {
-          font-family: "Inter", sans-serif;
+          font-family: 'Inter', sans-serif;
         }
       `}</style>
 
@@ -165,10 +154,7 @@ export default function Home() {
       </div>
 
       <div className="px-4 py-10 md:py-20 max-w-7xl mx-auto">
-        <h1
-          ref={titleRef}
-          className="relative z-10 mx-auto max-w-5xl text-center text-3xl font-extrabold text-neutral-800 md:text-5xl lg:text-7xl leading-tight"
-        >
+        <h1 ref={titleRef} className="relative z-10 mx-auto max-w-5xl text-center text-3xl font-extrabold text-neutral-800 md:text-5xl lg:text-7xl leading-tight">
           {"Your AI Medical Assistant: Intelligent Health Guidance"
             .split(" ")
             .map((word, index) => (
@@ -178,19 +164,11 @@ export default function Home() {
             ))}
         </h1>
 
-        <p
-          ref={paragraphRef}
-          className="relative z-10 mx-auto max-w-2xl py-6 text-center text-lg font-light text-neutral-600"
-        >
-          Leveraging advanced AI, MediAI provides personalized health insights, instant symptom
-          analysis, and reliable medical information, empowering you to make informed decisions
-          about your well-being.
+        <p ref={paragraphRef} className="relative z-10 mx-auto max-w-2xl py-6 text-center text-lg font-light text-neutral-600">
+          Leveraging advanced AI, MediAI provides personalized health insights, instant symptom analysis, and reliable medical information, empowering you to make informed decisions about your well-being.
         </p>
 
-        <div
-          ref={ctaRef}
-          className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-6"
-        >
+        <div ref={ctaRef} className="relative z-10 mt-10 flex flex-wrap items-center justify-center gap-6">
           <Link href="/chat-with-ai">
             <button className="w-60 transform rounded-full bg-blue-600 px-8 py-3 font-semibold text-white shadow-lg transition-all duration-300 hover:scale-105 hover:bg-blue-700">
               Chat with AI
@@ -203,10 +181,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div
-          ref={imageCardRef}
-          className="relative z-10 mt-28 rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl overflow-hidden"
-        >
+        <div ref={imageCardRef} className="relative z-10 mt-28 rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl overflow-hidden">
           <div className="w-full rounded-2xl overflow-hidden border border-neutral-300">
             <img
               src="https://placehold.co/1200x675/f0f0f0/333333?text=AI+Medical+Interface"
@@ -216,14 +191,10 @@ export default function Home() {
               width={1200}
             />
           </div>
-          <div
-            className="absolute inset-0 rounded-3xl pointer-events-none"
-            style={{
-              background:
-                "radial-gradient(circle at center, rgba(0,128,255,0.05) 0%, transparent 70%)",
-              zIndex: -1,
-            }}
-          ></div>
+          <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{
+            background: 'radial-gradient(circle at center, rgba(0,128,255,0.05) 0%, transparent 70%)',
+            zIndex: -1
+          }}></div>
         </div>
       </div>
 

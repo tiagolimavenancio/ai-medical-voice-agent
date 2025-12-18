@@ -1,6 +1,5 @@
 "use client";
-import { SessionDetail } from "@/app/(routes)/dashboard/medical-agent/[sessionId]/page";
-import { Button } from "@/components/ui/button";
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { SessionDetail } from "../medical-agent/[sessionid]/page";
 import moment from "moment";
 
 type ReportType = {

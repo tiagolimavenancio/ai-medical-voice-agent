@@ -1,5 +1,4 @@
-import ViewReportDialog from "@/app/(routes)/dashboard/_components/ViewReportDialog";
-import { SessionDetail } from "@/app/(routes)/dashboard/medical-agent/[sessionId]/page";
+import React from "react";
 import {
   Table,
   TableBody,
@@ -9,7 +8,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { SessionDetail } from "../medical-agent/[sessionid]/page";
 import moment from "moment";
+import ViewReportDialog from "./ViewReportDialog";
 
 type HistoryTableProps = {
   historyList: SessionDetail[];
