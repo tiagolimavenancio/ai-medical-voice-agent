@@ -7,16 +7,6 @@ This project is inspired by real-time AI voice agent implementations and educati
 
 ---
 
-## 🎥 Demo & Reference
-
-* 📺 Video Tutorial:
-  [Build & Deploy a Real-Time AI Medical Voice Agent](https://www.youtube.com/watch?v=zjwj21wzs4U)
-
-* 📦 Reference Repository:
-  [https://github.com/sumamakhan761/Ai-docter-agent](https://github.com/sumamakhan761/Ai-docter-agent)
-
----
-
 ## ✨ Features
 
 * 🎙️ Real-time voice interaction
